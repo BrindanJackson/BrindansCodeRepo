@@ -1,11 +1,25 @@
-unparsed_string = ""
+class Test
 
-index = 0
+	def initialize()
+		@x = 1
+		@y = 2
+		@z = 0
+	end
 
-while unparsed_string.size()
+	def show
+		puts @x 
+		puts @y
+		puts @z
+	end
 
-  if unparsed_string[index] == ""
-
-  end
+	def right
+		@z = @x + @y
+	end
 
 end
+
+x = Test.new()
+
+x.right
+
+puts x.show
