@@ -10,8 +10,14 @@ class Tokenizer
     @error_msg = "Error"
   end
 
+  def newString(string)
+    @unparsed_string = string
+    @current_index = 0
+    @current_char = @unparsed_string[0]
+    @token = ""
+  end
+
   def show
-    puts @token_list
     puts @token_types
   end
 
@@ -423,13 +429,34 @@ class Tokenizer
         nextChar
       end
     end
+    @token_list.push("EOF")
+    @token_types.push(33)
   #End of Function Tokenize
   end
 
 #End of Class Tokenizer
 end
 
+x = Tokenizer.new ("")
+string_to_parse = ""
 
-x = Tokenizer.new ("XD 2 program;===")
-x.tokenize
-x.show
+
+if ARGV.length == 1
+  file_name = ARGV[0]
+
+  f = File.open(file_name, "r")
+
+  f.each_line do |line|
+    string_to_parse = string_to_parse + line
+  end
+
+  f.close
+
+
+  x.newString(string_to_parse)
+  x.tokenize
+
+  x.show
+else
+  puts "Error: Too many or too few arguments"
+end
