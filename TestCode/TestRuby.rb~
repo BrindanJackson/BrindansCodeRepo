@@ -1,29 +1,6 @@
-class Test
+x = "program hbo so call"
 
-	def initialize()
-		@x = 1
-		@y = 2
-		@z = 0
-	end
+y = 0
 
-	def show
-		puts @x 
-		puts @y
-		puts @z
-	end
 
-	def right
-		@z = @x + @y
-	end
-
-	def wrong
-		z = x + x
-	end
-
-end
-
-x = Test.new()
-
-x.right
-
-puts x.show
+puts x[y..y+6]
