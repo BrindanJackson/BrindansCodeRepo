@@ -6,8 +6,13 @@ class Tokenizer
     @token = ""
     @unparsed_string = unparsed
     @current_index = 0
-    @current_char = ""
+    @current_char = @unparsed_string[0]
     @error_msg = "Error"
+  end
+
+  def show
+    puts @token_list
+    puts @token_types
   end
 
   def upperCase?(x)
@@ -103,6 +108,10 @@ class Tokenizer
           @token_types.push(34)
           done = 1
         end
+        
+        if @current_index == @unparsed_string.length()
+          done = 1
+        end
       
       #checks Uppercase identifiers
       elsif upperCase?(@current_char)
@@ -116,6 +125,7 @@ class Tokenizer
           @token = @token + @current_char
           @token_list.push(@token)
           @token_types.push(32)
+          done = 1
         elsif lowerCase?(@current_char)
           @token_list.push(@error_msg)
           @token_types.push(34)
@@ -137,11 +147,11 @@ class Tokenizer
             done = 1
           else
             @token_list.push(@token)
-            @token_type.push(32)
+            @token_types.push(32)
           end
         else
           @token_list.push(@token)
-          @token_type.push(32)
+          @token_types.push(32)
         end
         
       #checks integers
@@ -163,17 +173,263 @@ class Tokenizer
           @token_types.push(34)
         else
           @token_list.push(@token)
-          @token_type.push(31)
+          @token_types.push(31)
         end
         
       #checks all else
-      elsif
-
-
+      elsif @current_char == ";"
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push(";")
+          @token_types.push(12)
+          nextChar
+        else
+          @token_list.push(";")
+          @token_types.push(12)
+          done = 1
+        end
+      elsif @current_char == ","
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push(",")
+          @token_types.push(13)
+          nextChar
+        else
+          @token_list.push(",")
+          @token_types.push(13)
+          done = 1
+        end
+      elsif @current_char == "="
+        @token = ""
+        if !(@unparsed_string.length() == @current_index+1)
+          @token = @token + "="
+          nextChar
+          if !(@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(26)
+            nextChar
+          elsif (@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(26)
+            done = 1
+          else
+            @token_list.push("=")
+            @token_types.push(14)
+          end
+        else
+          @token_list.push("=")
+          @token_types.push(14)
+          done = 1
+        end
+      elsif @current_char == "!"
+        @token = ""
+        if !(@unparsed_string.length() == @current_index+1)
+          @token = @token + "!"
+          nextChar
+          if !(@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(25)
+            nextChar
+          elsif (@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(25)
+            done = 1
+          else
+            @token_list.push("!")
+            @token_types.push(15)
+          end
+        else
+          @token_list.push("!")
+          @token_types.push(15)
+          done = 1
+        end
+      elsif @current_char == "["
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push("[")
+          @token_types.push(16)
+          nextChar
+        else
+          @token_list.push("[")
+          @token_types.push(16)
+          done = 1
+        end
+      elsif @current_char == "]"
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push("]")
+          @token_types.push(17)
+          nextChar
+        else
+          @token_list.push("]")
+          @token_types.push(17)
+          done = 1
+        end
+      elsif @current_char == "&"
+        @token = ""
+        if !(@unparsed_string.length() == @current_index+1)
+          @token = @token + "&"
+          nextChar
+          if !(@unparsed_string.length() == @current_index+1) && @current_char == "&"
+            @token = @token + "&"
+            @token_list.push(@token)
+            @token_types.push(18)
+            nextChar
+          elsif (@unparsed_string.length() == @current_index+1) && @current_char == "&"
+            @token = @token + "&"
+            @token_list.push(@token)
+            @token_types.push(18)
+            done = 1
+          else
+            @token_list.push(@error_msg)
+            @token_types.push(34)
+          end
+        else
+          @token_list.push(@error_msg)
+          @token_types.push(34)
+          done = 1
+        end
+      elsif @current_char == "|"
+        @token = ""
+        if !(@unparsed_string.length() == @current_index+1)
+          @token = @token + "|"
+          nextChar
+          if !(@unparsed_string.length() == @current_index+1) && @current_char == "|"
+            @token = @token + "|"
+            @token_list.push(@token)
+            @token_types.push(19)
+            nextChar
+          elsif (@unparsed_string.length() == @current_index+1) && @current_char == "&"
+            @token = @token + "|"
+            @token_list.push(@token)
+            @token_types.push(19)
+            done = 1
+          else
+            @token_list.push(@error_msg)
+            @token_types.push(34)
+          end
+        else
+          @token_list.push(@error_msg)
+          @token_types.push(34)
+          done = 1
+        end
+      elsif @current_char == "("
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push("(")
+          @token_types.push(20)
+          nextChar
+        else
+          @token_list.push("(")
+          @token_types.push(20)
+          done = 1
+        end
+      elsif @current_char == ")"
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push(")")
+          @token_types.push(21)
+          nextChar
+        else
+          @token_list.push(")")
+          @token_types.push(21)
+          done = 1
+        end
+      elsif @current_char == "+"
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push("+")
+          @token_types.push(22)
+          nextChar
+        else
+          @token_list.push("+")
+          @token_types.push(22)
+          done = 1
+        end
+      elsif @current_char == "-"
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push("-")
+          @token_types.push(23)
+          nextChar
+        else
+          @token_list.push("-")
+          @token_types.push(23)
+          done = 1
+        end
+      elsif @current_char == "*"
+        if !(@unparsed_string.length() == @current_index+1)
+          @token_list.push("*")
+          @token_types.push(24)
+          nextChar
+        else
+          @token_list.push("*")
+          @token_types.push(24)
+          done = 1
+        end
+      elsif @current_char == "<"
+        @token = ""
+        if !(@unparsed_string.length() == @current_index+1)
+          @token = @token + "<"
+          nextChar
+          if !(@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(29)
+            nextChar
+          elsif (@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(29)
+            done = 1
+          else
+            @token_list.push("<")
+            @token_types.push(27)
+          end
+        else
+          @token_list.push("<")
+          @token_types.push(27)
+          done = 1
+        end
+      elsif @current_char == ">"
+        @token = ""
+        if !(@unparsed_string.length() == @current_index+1)
+          @token = @token + ">"
+          nextChar
+          if !(@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(30)
+            nextChar
+          elsif (@unparsed_string.length() == @current_index+1) && @current_char == "="
+            @token = @token + "="
+            @token_list.push(@token)
+            @token_types.push(30)
+            done = 1
+          else
+            @token_list.push(">")
+            @token_types.push(28)
+          end
+        else
+          @token_list.push(">")
+          @token_types.push(28)
+          done = 1
+        end
+      elsif @current_char == "\n" || @current_char == "\t" || @current_char == "\r" || @current_char == " "
+        if !(@unparsed_string.length() == @current_index+1)
+          nextChar
+        else
+          done = 1
+        end
+      elsif @current_char == "\0"
+        done = 1
+      else
+        nextChar
       end
     end
-  #End of function Tokenize
+  #End of Function Tokenize
   end
 
-#end of Class Tokenizer
+#End of Class Tokenizer
 end
+
+
+x = Tokenizer.new ("XD 2 program;===")
+x.tokenize
+x.show
