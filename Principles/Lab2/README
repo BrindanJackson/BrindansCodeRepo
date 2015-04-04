@@ -1,0 +1,13 @@
+Files:
+
+	"PrinciplesLab2.rb" - Ruby file which contains the Tokenizer class and all of its functions.
+												It also contains the main function which takes file input and uses
+												Tokenizer class to parse said input.
+
+Compilation and Execution:
+
+	To run the program, type the command below into a linux terminal with ruby installed.
+		ruby PrinciplesLab2.rb <filename>
+
+	When typing the command above, be sure to replace <filename> with the text file you wish to
+	use with the program. Make sure that the filename entered is the correct name.

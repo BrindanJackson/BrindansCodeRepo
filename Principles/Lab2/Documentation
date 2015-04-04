@@ -1,0 +1,59 @@
+Tokenizer:
+
+  General Description:
+		
+    An instance of the Tokenizer class takes a string as input when initialized or using its
+    method @newString(string). It parses the string loads the array @token_list with the tokens
+    contained in the string based on the rules given for the Core language. When tokens are
+    added to @token_list, simultaniously, numbers are added to the array @token_types. These
+    numbers correspond to the tokens in @token_list and describe what type of token each token is.
+
+  Variables:
+
+    @token_list - Array which holds all of the tokens.
+
+    @token_types - Array which hold numbers which represent the which type of token each token in
+                   @token_list is.
+
+    @token - String which holds a potential token. As more characters ae discovered to be part of
+             the token, they are concatinated onto @token and when the full token is found, @token is
+             then added to @token_list.
+
+    @unparsed_string - String being parsed for tokens.
+
+    @current_index - Index of the current character being analyzed by the tokenizer function @Tokenize
+
+    @current_char - Current character being anazlyzed by the tokenizer function @Tokenize
+
+    @error_msg - Error message to be displayed when an error is found when parsing @unparsed_string
+
+  Methods:
+
+    @initialize(unparsed) - Initializes all variables. @token_list and @token_types are initialzed as
+                            empty arrays. @token initialized as an empty string. @unparsed_string
+                            initialized to equal the input unparsed. @current_index initialized to 0.
+                            @current_char initialized to the first character of @unparsed_string
+                            @error_msg initialzed to equal "Error: Illegal token encountered"
+
+		@newString(string) - Takes string and assigns it to @unparsed_string and reinitializes
+                         @current_index, @current_char and @token accordingly.
+
+    @show - outputs the contents of @token_types replacing the token number 34 with @error_msg
+
+    @upperCase?(x) - returns index of first uppercase character in x. Return Nil otherwise
+
+    @lowerCase?(x) - returns index of first lowercase character in x. Returns Nil otherwise
+
+    @number?(x) - returns index of first digit in x. Returns Nil otherwise
+
+    @nextChar - increments @current_index and assigns character of @unparsed_string at that index to
+                @current_char
+
+    @tokenize - parses @unparsed_string and finds tokens. Tokens are added to the array @token_list.
+                The token type ids of said tokens are added to @token_types.
+
+Testing:
+
+  As for testing purposes, the tokenizer was tested using the examples given on carmen. Along with
+  that, additional testing was done which tests each token seperately and tests possible errors with
+  each token. Program seems to work properly.

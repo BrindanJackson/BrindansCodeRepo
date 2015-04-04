@@ -10,6 +10,6 @@ program int X1, X4; int X2, X3, X7;
   
                             end ;
   
-               write X2;
+               wrte X2;
   
           end
