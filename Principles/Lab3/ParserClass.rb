@@ -5,6 +5,7 @@ class Parser
     @token_list = token_list #array of tokens
     @token_types = token_types #array of token types
     @current_tok = 0
+    @program
   end
 
   #returns current token
@@ -18,7 +19,7 @@ class Parser
   end
 
   def skip_token
-    @current_tok++
+    @current_tok = @current_tok + 1
   end
 
 
@@ -34,6 +35,7 @@ class Parser
       @id = current_token
       skip_token
 
+      #if ;
       if current_type != 12
         skip_token
         @decl = Decl.new()
@@ -50,12 +52,15 @@ class Parser
     end
 
     def ParseDS
+      #skip int
       skip_token
       @decl = Decl.new()
       @decl.ParseDecl
 
+      #skip ;
       skip_token
-      if current_type != 4
+
+      if current_type == 4
         @ds = DS.new()
         @decl.ParseDS
       end
@@ -178,6 +183,8 @@ class Parser
     end
 
     def ParseComp
+
+      #skip (
       skip_token
       @op1 = Op.new()
       @op1.ParseOp
@@ -377,6 +384,7 @@ class Parser
 
       @idList = IdList.new()
       @idList.ParseIdList
+    end
   end #end of Out class
 
   #Stmt class
@@ -391,18 +399,27 @@ class Parser
 
     def ParseStmt
       #parses depending on statment type
+      #if ID
       if current_type == 32
         @assign = Assign.new()
         @assign.ParseAssign
+
+      #if If
       elsif current_type == 5
         @if = If.new()
         @if.ParseIf
+
+      #if While
       elsif current_type == 8
         @loop = Loop.new()
         @loop.ParseLoop
+
+      #if Read
       elsif current_type == 10
         @in = In.new()
         @in.ParseIn
+
+      #if Write
       elsif current_type == 11
         @out = Out.new()
         @out.ParseOut
@@ -418,7 +435,10 @@ class Parser
     end
 
     def ParseSS
+      #skip begin
       skip_token
+
+      #if Assign or If or Loop or In or Out
       if(current_type == 32 || current_type == 5 || current_type == 8 || current_type == 10 || current_type == 11)
         @stmt = Stmt.new()
         @stmt.ParseStmt
@@ -447,5 +467,10 @@ class Parser
       @ss.ParseSS
     end
   end #end of Prog class
+
+  def program
+    @program = Prog.new()
+    @program.ParseProg
+  end
 
 end #end of Parser class
