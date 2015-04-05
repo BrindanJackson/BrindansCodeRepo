@@ -29,7 +29,7 @@ if ARGV.length == 1
   x.show
 
   y = Parser.new(x.token_list, x.token_types)
-  y.program
+  y.program(x.token_list, x.token_types, 0)
 else
   puts "Error: Too many or too few arguments"
 end

@@ -31,16 +31,17 @@ class Parser
       @decl
     end
 
-    def ParseDecl
-      @id = current_token
-      skip_token
+    def ParseDecl(tokens, types, i)
+      @id = tokens[i]
+      i=i+1
 
       #if ;
-      if current_type != 12
-        skip_token
+      if types[i] != 12
+        i=i+1
         @decl = Decl.new()
-        @decl.ParseDecl
+        i = @decl.ParseDecl(tokens, types, i)
       end
+      i
     end
   end #end of Decl class
 
@@ -51,19 +52,21 @@ class Parser
       @ds
     end
 
-    def ParseDS
+    def ParseDS(tokens, types, i)
       #skip int
-      skip_token
+      i=i+1
       @decl = Decl.new()
-      @decl.ParseDecl
+      i = @decl.ParseDecl(tokens, types, i)
 
       #skip ;
-      skip_token
+      i=i+1
 
-      if current_type == 4
+      #if int
+      if types[i] == 4
         @ds = DS.new()
-        @decl.ParseDS
+        i = @decl.ParseDS(tokens, types, i)
       end
+      i
     end
   end #end DS class
   #End of DS breakdown
@@ -78,9 +81,9 @@ class Parser
       @id
     end
 
-    def ParseId
-      @id = current_token
-      skip_token
+    def ParseId(tokens, types, i)
+      @id = tokens[i]
+      i=i+1
     end
   end #end of Id class
 
@@ -92,21 +95,23 @@ class Parser
       @exp
     end
 
-    def ParseOp
+    def ParseOp(tokens, types, i)
       #if Integer
-      if current_type == 31
-        @no = current_token
-        skip_token
+      if types[i] == 31
+        @no = tokens[i]
+        i=i+1
       #if Identifier
-      elsif current_type == 32
-        @id = current_token
+    elsif types[i] == 32
+        @id = tokens[i]
+        i=i+1
       #if Parentheses
-      elsif current_type == 20
-        skip_token
+    elsif types[i] == 20
+        i=i+1
         @exp = Exp.new()
-        @exp.ParseExp
-        skip_token
+        i = @exp.ParseExp(tokens, types, i)
+        i=i+1
       end
+      i
     end
   end #end of Op class
 
@@ -118,15 +123,16 @@ class Parser
       @trm
     end
 
-    def ParseTrm
+    def ParseTrm(tokens, types, i)
       @op = Op.new()
-      @op.ParseOp
-      if current_type == 24
+      i = @op.ParseOp(tokens, types, i)
+      if types[i] == 24
         @multiply = 1
-        skip_token
+        i=i+1
         @trm = Trm.new()
-        @trm.ParseTrm
+        i = @trm.ParseTrm(tokens, types, i)
       end
+      i
     end
   end #end of Trm class
 
@@ -138,23 +144,24 @@ class Parser
       @exp
     end
 
-    def ParseExp
+    def ParseExp(tokens, types, i)
       @trm = Trm.new()
-      @trm.ParseTrm
+      i = @trm.ParseTrm(tokens, types, i)
 
       #if Plus
-      if current_type == 22
+      if types[i] == 22
         @expType = 1
-        skip_token
+        i=i+1
         @exp = Exp.new()
-        @exp.ParseExp
+        i = @exp.ParseExp(tokens, types, i)
       #if Minus
-      elsif current_type == 23
+    elsif types[i] == 23
         @expType = 2
-        skip_token
+        i=i+1
         @exp = Exp.new()
-        @exp.ParseExp
+        i = @exp.ParseExp(tokens, types, i)
       end
+      i
     end
   end #end of Exp class
 
@@ -165,12 +172,12 @@ class Parser
       @exp
     end
 
-    def ParseAssign
+    def ParseAssign(tokens, types, i)
       @id = Id.new()
-      @id.ParseId
-      skip_token
+      i = @id.ParseId(tokens, types, i)
+      i=i+1
       @exp = Exp.new()
-      @exp.ParseExp
+      i = @exp.ParseExp(tokens, types, i)
     end
   end #end of Assign class
 
@@ -182,36 +189,36 @@ class Parser
       @op2
     end
 
-    def ParseComp
+    def ParseComp(tokens, types, i)
 
       #skip (
-      skip_token
+      i=i+1
       @op1 = Op.new()
-      @op1.ParseOp
+      i = @op1.ParseOp(tokens, types, i)
 
       #if !=
-      if current_type == 25
+      if types[i] == 25
         @compOp = 1
       #if ==
-      elsif current_type == 26
+    elsif types[i] == 26
         @compOp = 2
       #if <
-      elsif current_type == 27
+    elsif types[i] == 27
         @compOp = 3
       #if >
-      elsif current_type == 28
+    elsif types[i] == 28
         @compOp = 4
       #if <=
-      elsif current_type == 29
+    elsif types[i] == 29
         @compOp = 5
       #if >=
-      elsif current_type == 30
+    elsif types[i] == 30
         @compOp = 6
       end
 
-      skip_token
+      i=i+1
       @op2 = Op.new()
-      @op2.ParseOp
+      i = @op2.ParseOp(tokens, types, i)
 
     end
   end #end class Comp
@@ -225,43 +232,43 @@ class Parser
       @cond2
     end
 
-    def ParseCond
+    def ParseCond(tokens, types, i)
 
       #if (
-      if current_type == 20
+      if types[i] == 20
         @comp = Comp.new()
-        @comp.ParseComp
+        i = @comp.ParseComp(tokens, types, i)
         #skip )
-        skip_token
+        i=i+1
       #if !
-      elsif current_type == 15
-        skip_token
+    elsif types[i] == 15
+        i=i+1
         @cond1 = Cond.new()
-        @cond1.ParseCond
+        i = @cond1.ParseCond(tokens, types, i)
       #if [
-      elsif current_type == 16
+    elsif types[i] == 16
         #skip [
-        skip_token
+        i=i+1
 
         @cond1 = Cond.new()
-        @cond1.ParseCond
+        i = @cond1.ParseCond(tokens, types, i)
 
         #if &&
-        if current_type == 18
+        if types[i] == 18
           @andOr = 1
         #if ||
-        elsif current_type == 19
+      elsif types[i] == 19
           @andOr = 2
         end
 
         #skip && or ||
-        skip_token
+        i=i+1
 
         @cond2 = Cond.new()
-        @cond2.ParseCond
+        i = @cond2.ParseCond(tokens, types, i)
 
         #skip ]
-        skip_token
+        i=i+1
 
       end
     end
@@ -275,35 +282,35 @@ class Parser
       @ss2
     end
 
-    def ParseIf
+    def ParseIf(tokens, types, i)
       #skip if token
-      skip_token
+      i=i+1
 
       @cond = Cond.new()
-      @cond.ParseCond
+      i = @cond.ParseCond(tokens, types, i)
 
       #skip then token
-      skip_token
+      i=i+1
 
       @ss1 = SS.new()
-      @ss1.ParseSS
+      i = @ss1.ParseSS(tokens, types, i)
 
       #skip ;
-      skip_token
+      i=i+1
 
-      if current_type == 7
+      if types[i] == 7
         #skip else
-        skip_token
+        i=i+1
 
         @ss2 = SS.new()
-        @ss2.ParseSS
+        i = @ss2.ParseSS(tokens, types, i)
 
         #skip ;
-        skip_token
+        i=i+1
       end
 
       #skip end
-      skip_token
+      i=i+1
     end
   end #end of If class
 
@@ -314,24 +321,24 @@ class Parser
       @ss
     end
 
-    def ParseLoop
+    def ParseLoop(tokens, types, i)
       #skip while
-      skip_token
+      i=i+1
 
       @cond = Cond.new()
-      @cond.ParseCond
+      i = @cond.ParseCond(tokens, types, i)
 
       #skip loop
-      skip_token
+      i=i+1
 
       @ss = SS.new()
-      @ss.ParseSS
+      i = @ss.ParseSS(tokens, types, i)
 
       #skip ;
-      skip_token
+      i=i+1
 
       #skip end
-      skip_token
+      i=i+1
     end
 
   end #end of Loop class
@@ -343,17 +350,18 @@ class Parser
       @idList
     end
 
-    def ParseIdList
+    def ParseIdList(tokens, types, i)
       @id = Id.new()
-      @id.ParseId
+      i = @id.ParseId(tokens, types, i)
 
-      if current_type == 13
+      if types[i] == 13
         #skip ,
-        skip_token
+        i=i+1
 
         @idList = IdList.new()
-        @idList.ParseIdList
+        i = @idList.ParseIdList(tokens, types, i)
       end
+      i
     end
   end #end IdList class
 
@@ -363,12 +371,12 @@ class Parser
       @idList
     end
 
-    def ParseIn
+    def ParseIn(tokens, types, i)
       #skip read
-      skip_token
+      i=i+1
 
       @idList = IdList.new()
-      @idList.ParseIdList
+      i = @idList.ParseIdList(tokens, types, i)
     end
   end #end of In class
 
@@ -378,12 +386,12 @@ class Parser
       @idList
     end
 
-    def ParseIn
+    def ParseIn(tokens, types, i)
       #skip write
-      skip_token
+      i=i+1
 
       @idList = IdList.new()
-      @idList.ParseIdList
+      i = @idList.ParseIdList(tokens, types, i)
     end
   end #end of Out class
 
@@ -397,33 +405,34 @@ class Parser
       @out
     end
 
-    def ParseStmt
+    def ParseStmt(tokens, types, i)
       #parses depending on statment type
       #if ID
-      if current_type == 32
+      if types[i] == 32
         @assign = Assign.new()
-        @assign.ParseAssign
+        i = @assign.ParseAssign(tokens, types, i)
 
       #if If
-      elsif current_type == 5
-        @if = If.new()
-        @if.ParseIf
+      elsif types[i] == 5
+          @if = If.new()
+          i = @if.ParseIf(tokens, types, i)
 
       #if While
-      elsif current_type == 8
-        @loop = Loop.new()
-        @loop.ParseLoop
+      elsif types[i] == 8
+          @loop = Loop.new()
+          i = @loop.ParseLoop(tokens, types, i)
 
       #if Read
-      elsif current_type == 10
-        @in = In.new()
-        @in.ParseIn
+      elsif types[i] == 10
+          @in = In.new()
+          i = @in.ParseIn(tokens, types, i)
 
       #if Write
-      elsif current_type == 11
-        @out = Out.new()
-        @out.ParseOut
+      elsif types[i] == 11
+          @out = Out.new()
+          i = @out.ParseOut(tokens, types, i)
       end
+      i
     end
   end #end Stmt class
 
@@ -434,17 +443,18 @@ class Parser
       @ss
     end
 
-    def ParseSS
+    def ParseSS(tokens, types, i)
       #skip begin
-      skip_token
+      i=i+1
 
       #if Assign or If or Loop or In or Out
-      if(current_type == 32 || current_type == 5 || current_type == 8 || current_type == 10 || current_type == 11)
+      if(types[i] == 32 || types[i] == 5 || types[i] == 8 || types[i] == 10 || types[i] == 11)
         @stmt = Stmt.new()
-        @stmt.ParseStmt
+        i = @stmt.ParseStmt(tokens, types, i)
         @ss = SS.new()
-        @ss.ParseSS
+        i = @ss.ParseSS(tokens, types, i)
       end
+      i
     end
   end #end SS class
   #End of SS breakdown
@@ -457,20 +467,22 @@ class Parser
       @ss
     end
 
-    def ParseProg
+    def ParseProg(tokens, types, i)
       #skip the program token
-      skip_token
+      #skip_token
+      i=i+1
 
       @ds = DS.new()
-      @ds.ParseDS
+      i = @ds.ParseDS(tokens, types, i)
       @ss = SS.new()
-      @ss.ParseSS
+      i = @ss.ParseSS(tokens, types, i)
     end
   end #end of Prog class
 
-  def program
+  def program(tokens, types, i)
     @program = Prog.new()
-    @program.ParseProg
+    x = @program.ParseProg(tokens, types, i)
+    puts x
   end
 
 end #end of Parser class
