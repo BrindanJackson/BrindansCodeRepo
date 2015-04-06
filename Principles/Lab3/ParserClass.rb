@@ -43,6 +43,16 @@ class Parser
       end
       i
     end
+
+    def PrintDecl
+      print @id + " "
+
+      if @decl
+        print ", "
+        @decl.PrintDecl
+      end
+
+    end
   end #end of Decl class
 
   #DS class
@@ -64,10 +74,27 @@ class Parser
       #if int
       if types[i] == 4
         @ds = DS.new()
-        i = @decl.ParseDS(tokens, types, i)
+        i = @ds.ParseDS(tokens, types, i)
       end
       i
     end
+
+    def PrintDS(tab)
+      tab.times do
+        print "\t"
+      end
+
+      print "int "
+
+      @decl.PrintDecl
+
+      puts ";"
+
+      if @ds
+        @ds.PrintDS(tab)
+      end
+
+    end #end of PrintDS
   end #end DS class
   #End of DS breakdown
 
@@ -84,6 +111,10 @@ class Parser
     def ParseId(tokens, types, i)
       @id = tokens[i]
       i=i+1
+    end
+
+    def PrintId
+      print @id + " "
     end
   end #end of Id class
 
@@ -113,6 +144,17 @@ class Parser
       end
       i
     end
+
+    def PrintOp
+      if @no
+        print @no + " "
+      elsif @id
+        print @id + " "
+      elsif @exp
+        @exp.PrintExp
+      end
+    end
+
   end #end of Op class
 
   #Trm class
@@ -134,6 +176,16 @@ class Parser
       end
       i
     end
+
+    def PrintTrm
+      @op.PrintOp
+
+      if @multiply == 1
+        print "* "
+        @trm.PrintTrm
+      end
+    end
+
   end #end of Trm class
 
   #Exp class
@@ -163,6 +215,19 @@ class Parser
       end
       i
     end
+
+    def PrintExp
+      @trm.PrintTrm
+
+      if @expType == 1
+        print "+ "
+        @exp.PrintExp
+      elsif @expType == 2
+        print "- "
+        @exp.PrintExp
+      end
+
+    end
   end #end of Exp class
 
   #Assign class
@@ -179,6 +244,13 @@ class Parser
       @exp = Exp.new()
       i = @exp.ParseExp(tokens, types, i)
     end
+
+    def PrintAssign
+      @id.PrintId
+      print "= "
+      @exp.PrintExp
+    end
+
   end #end of Assign class
 
   #class Comp
@@ -221,13 +293,34 @@ class Parser
       i = @op2.ParseOp(tokens, types, i)
 
     end
+
+    def PrintComp
+      @op1.PrintOp
+      if @compOp == 1
+        print "!= "
+      elsif @compOp == 2
+        print "== "
+      elsif @compOp == 3
+        print "< "
+      elsif @compOp == 4
+        print "> "
+      elsif @compOp == 5
+        print "<= "
+      elsif @compOp == 6
+        print ">= "
+      end
+      @op2.PrintOp
+    end
+
   end #end class Comp
 
   #Cond class
   class Cond
     def initialize
       @comp
+      @not = 0
       @cond1
+      @bracket = 0
       @andOr = 0
       @cond2
     end
@@ -243,10 +336,12 @@ class Parser
       #if !
     elsif types[i] == 15
         i=i+1
+        @not = 1
         @cond1 = Cond.new()
         i = @cond1.ParseCond(tokens, types, i)
       #if [
     elsif types[i] == 16
+        @bracket = 1
         #skip [
         i=i+1
 
@@ -271,7 +366,29 @@ class Parser
         i=i+1
 
       end
+      i
     end
+
+    def PrintCond
+      if @comp
+        @comp.PrintComp
+      elsif @not == 1
+        print "!"
+        @cond1.PrintCond
+      elsif @bracket == 1
+        print "[ "
+        @cond1.PrintCond
+        if @andOr == 1
+          print "&& "
+        elsif @andOr == 2
+          print "|| "
+        end
+        @cond2.PrintCond
+        print "] "
+      end
+
+    end
+
   end #end of Cond class
 
   #If class
@@ -290,28 +407,43 @@ class Parser
       i = @cond.ParseCond(tokens, types, i)
 
       #skip then token
-      i=i+1
+      #i=i+1
 
       @ss1 = SS.new()
       i = @ss1.ParseSS(tokens, types, i)
 
       #skip ;
-      i=i+1
+      #i=i+1
 
       if types[i] == 7
         #skip else
-        i=i+1
+        #i=i+1
 
         @ss2 = SS.new()
         i = @ss2.ParseSS(tokens, types, i)
 
         #skip ;
-        i=i+1
+        #i=i+1
       end
 
       #skip end
       i=i+1
     end
+
+    def PrintIf(tab)
+      print "If "
+      @cond.PrintCond
+      puts "then"
+      @ss1.PrintSS(tab+1)
+
+      if @ss2
+        puts "else"
+        @ss2.PrintSS(tab+1)
+      end
+      print "end "
+
+    end
+
   end #end of If class
 
   #Loop class
@@ -328,17 +460,24 @@ class Parser
       @cond = Cond.new()
       i = @cond.ParseCond(tokens, types, i)
 
-      #skip loop
-      i=i+1
-
       @ss = SS.new()
       i = @ss.ParseSS(tokens, types, i)
 
       #skip ;
       i=i+1
 
-      #skip end
-      i=i+1
+    end
+
+    def PrintLoop(tab)
+      print "while "
+      @cond.PrintCond
+      puts "loop"
+      @ss.PrintSS(tab+1)
+      print "\n"
+      tab.times do
+        print "\t"
+      end
+      print "end "
     end
 
   end #end of Loop class
@@ -363,6 +502,14 @@ class Parser
       end
       i
     end
+
+    def PrintIdList
+      @id.PrintId
+      if @idList
+        @idList.PrintIdList
+      end
+    end
+
   end #end IdList class
 
   #In class
@@ -378,6 +525,11 @@ class Parser
       @idList = IdList.new()
       i = @idList.ParseIdList(tokens, types, i)
     end
+
+    def PrintIn
+      print "read "
+      @idList.PrintIdList
+    end
   end #end of In class
 
   #Out class
@@ -386,12 +538,17 @@ class Parser
       @idList
     end
 
-    def ParseIn(tokens, types, i)
+    def ParseOut(tokens, types, i)
       #skip write
       i=i+1
 
       @idList = IdList.new()
       i = @idList.ParseIdList(tokens, types, i)
+    end
+
+    def PrintOut
+      print "write "
+      @idList.PrintIdList
     end
   end #end of Out class
 
@@ -434,6 +591,22 @@ class Parser
       end
       i
     end
+
+    def PrintStmt(tab)
+      if @assign
+        @assign.PrintAssign
+      elsif @if
+        @if.PrintIf(tab)
+      elsif @loop
+        @loop.PrintLoop(tab)
+      elsif @in
+        @in.PrintIn
+      elsif @out
+        @out.PrintOut
+      end
+
+    end
+
   end #end Stmt class
 
   #SS class
@@ -456,6 +629,22 @@ class Parser
       end
       i
     end
+
+    def PrintSS(tab)
+      tab.times do
+        print "\t"
+      end
+
+      if @stmt
+        @stmt.PrintStmt(tab)
+        puts ";"
+      end
+
+      if @ss
+        @ss.PrintSS(tab)
+      end
+
+    end
   end #end SS class
   #End of SS breakdown
 
@@ -477,12 +666,22 @@ class Parser
       @ss = SS.new()
       i = @ss.ParseSS(tokens, types, i)
     end
+
+    def PrintProg
+      tab = 1
+      puts "program"
+      @ds.PrintDS(tab)
+      puts "begin"
+      @ss.PrintSS(tab)
+      print "\n"
+      puts "end"
+    end
   end #end of Prog class
 
   def program(tokens, types, i)
     @program = Prog.new()
     x = @program.ParseProg(tokens, types, i)
-    puts x
+    @program.PrintProg
   end
 
 end #end of Parser class
