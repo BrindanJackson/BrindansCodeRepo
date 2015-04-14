@@ -1,0 +1,18 @@
+Files:
+
+	"PrinciplesLab3.rb" - Ruby file which includes the other two files and calls the classes
+                        in the other two files.
+
+  "TokenizerClass.rb" - Ruby file which contains the Tokenizer class and all of its functions
+                        which turns a string into a series of tokens.
+
+  "ParserClass.rb"    - Ruby file which contains Parser Class and its functions which makes a
+                        parseTree, pretty prints the program and executes the program
+
+Compilation and Execution:
+
+	To run the program, type the command below into a linux terminal with ruby installed.
+		ruby PrinciplesLab3.rb <filename>
+
+	When typing the command above, be sure to replace <filename> with the text file you wish to
+	use with the program. Make sure that the filename entered is the correct name.
