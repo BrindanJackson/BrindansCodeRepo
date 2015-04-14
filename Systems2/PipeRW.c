@@ -1,13 +1,16 @@
+//gcc -o PipeRW PipeRW.c ssem.o sshm.o
+
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 #include "ssem.h"
 #include "sshm.h"
 
 #define MUTEX1KEY 485971
 
 int main(){
-  //Creating Semaphores
-  int mutex1 = sem_creat(MUTEX1KEY, 0);
+  //Creating Semaphore
+  int mutex1 = sem_create(MUTEX1KEY, 1);
   if(mutex1<0){
     printf("Semaphore mutex1 failed to be created.");
   }
@@ -19,7 +22,7 @@ int main(){
   pipe(fd);
 
   childpid1 = fork();
-  if(childpid2 != 0){
+  if(childpid1 != 0){
     childpid2 = fork();
   }
 
@@ -27,62 +30,62 @@ int main(){
 
   //Code for child process 1
   if(childpid1 == 0){
-    char number[3]
-    char buff[6]
+    char number1[3];
+    char buff1[6];
     for(i=0; i<500; i++){
-      memset(number, 0, sizeof(number));
-      memset(buff, 0, sizeof(buff));
-      sprint(number, "%d", i);
+      memset(number1, 0, sizeof(number1));
+      memset(buff1, 0, sizeof(buff1));
+      sprintf(number1, "%d", i+1);
       if(i<9){
-        strcpy(buff, "00");
+        strcpy(buff1, "00");
       }else if(i>=9 && i<99){
-        strcpy(buff, "0");
+        strcpy(buff1, "0");
       }
-      strcat(buff, number);
-      strcat(buff, "aaa");
+      strcat(buff1, number1);
+      strcat(buff1, "aaa");
       sem_wait(mutex1);
-      write(fd[1], buff, 6);
+      write(fd[1], buff1, 6);
       sem_signal(mutex1);
       if(i%100 == 0){
         usleep(100000);
       }
     }
   }else if(childpid2 == 0){ //Code for child process 2
-    char buff[3];
+    char buff2[3];
     char letter[1];
-    char number[1];
+    char number2[1];
     int num = 0;
     char a = 'A';
     for(i=0; i<260; i++){
-      memset(buff, 0, sizeof(buff));
+      memset(buff2, 0, sizeof(buff2));
       memset(letter, 0 ,sizeof(letter));
-      memset(number, 0, sizeof(number));
+      memset(number2, 0, sizeof(number2));
       if(a<'Z'){
-        sprintf(letter, %c, a);
+        sprintf(letter, "%c", a);
+        sprintf(number2, "%d", num);
         a++;
       }else{
-        sprintf(letter, %c, a);
+        sprintf(letter, "%c", a);
+        sprintf(number2, "%d", num);
         a = 'A';
         num++;
         if(num == 10){
           num = 0;
         }
       }
-
-      sprintf(number, "%d", num);
-      strcpy(buff, letter);
-      strcat(buff, "x");
-      strcat(buff, number);
+      strcpy(buff2, letter);
+      strcat(buff2, "x");
+      strcat(buff2, number2);
 
       sem_wait(mutex1);
-      write(fd[1], "",3)
+      write(fd[1], buff2, 3);
       sem_signal(mutex1);
       if(i%60 == 0){
         usleep(300000);
       }
     }
   }else{ //Code for main parent process
-    char buff[100];
+    char buff3[100];
     int return1, return2;
     //wait for both child processes to close
     wait(&return1);
@@ -91,9 +94,9 @@ int main(){
     int numberRead = 1;
     int reads = 0;
     while(numberRead != 0){
-
-      numberRead = read(fd[0], buff, 100);
-      printf("%s", buff);
+      memset(buff3, 0, sizeof(buff3));
+      numberRead = read(fd[0], buff3, 100);
+      printf("%s", buff3);
       reads++;
       if(reads%50 == 0){
         usleep(200000);
